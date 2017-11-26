@@ -7,6 +7,7 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 
+#include <emscripten/emscripten.h>
 #include "convertflac.h"
 
 void list_audio_devices(const ALCchar *devices);
@@ -15,14 +16,17 @@ char *get_PCM_info(const char *filename, uint32_t *dataSize, uint32_t *freq);
 
 int main(int argc, char **argv)
 {
-  const char *inFilename = "infile.flac";
-  const char *outFilename = "out.wav";
+  printf("ready to play \n");
+}
 
-  printf("Hello FLAC World\n");
+ALuint EMSCRIPTEN_KEEPALIVE play()
+{
+  const char *inFilename = "sample.flac";
+  const char *outFilename = "out.wav";
 
   printf("Starting convert flac to wav");
   convertFlacToWav(inFilename, outFilename);
-  printf("Conversion done!");
+  printf("Conversion done! \n");
 
   uint32_t dataSize;
   uint32_t freq;
@@ -66,8 +70,26 @@ int main(int argc, char **argv)
 
       alSourcePlay(source);
       manage_error();
+
+      return source;
     }
   }
+  return 0;
+}
+
+void EMSCRIPTEN_KEEPALIVE playSource(ALuint source)
+{
+  alSourcePlay(source);
+}
+
+void EMSCRIPTEN_KEEPALIVE pauseSource(ALuint source)
+{
+  alSourcePause(source);
+}
+
+void EMSCRIPTEN_KEEPALIVE stopSource(ALuint source)
+{
+  alSourceStop(source);
 }
 
 void list_audio_devices(const ALCchar *devices)
