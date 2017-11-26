@@ -14,7 +14,7 @@ static unsigned channels = 0;
 static unsigned bps = 0;
 
 
-void convert();
+void convertFlacToWav();
 
 
 

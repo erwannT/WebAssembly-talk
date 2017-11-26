@@ -28,7 +28,7 @@ static FLAC__bool write_little_endian_uint32(FILE *f, FLAC__uint32 x)
            fputc(x >> 24, f) != EOF;
 }
 
-void convert()
+void convertFlacToWav()
 {
     FLAC__bool ok = true;
     FLAC__StreamDecoder *decoder = 0;

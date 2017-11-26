@@ -5,3 +5,5 @@ flac_reader/index.wast
 flac_reader/outfile.wav
 flac_reader/test.txt
 flac_reader/test.wav
+
+.vscode

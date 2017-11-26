@@ -16,17 +16,17 @@
 
 void list_audio_devices(const ALCchar *devices);
 void manage_error();
-char *print_PCM_info();
+char *get_PCM_info();
 
 int main(int argc, char **argv)
 {
 
   printf("Hello FLAC World\n");
-  convert();
+  convertFlacToWav();
 
   uint32_t dataSize;
   uint32_t freq;
-  char *data = print_PCM_info(&dataSize, &freq);
+  char *data = get_PCM_info(&dataSize, &freq);
 
   list_audio_devices(alcGetString(NULL, ALC_DEVICE_SPECIFIER));
 
@@ -51,19 +51,14 @@ int main(int argc, char **argv)
   }
   else
   {
-    printf("reussi");
-
     ALuint buffer;
+    ALuint source;
 
     alGenBuffers((ALuint)1, &buffer);
-
     manage_error();
 
     alBufferData(buffer, AL_FORMAT_STEREO16, data, dataSize, freq);
-
     manage_error();
-
-    ALuint source;
 
     alGenSources((ALuint)1, &source);
     manage_error();
@@ -104,7 +99,7 @@ void manage_error()
   }
 }
 
-char *print_PCM_info(uint32_t *dataSize, uint32_t *freq)
+char *get_PCM_info(uint32_t *dataSize, uint32_t *freq)
 {
   FILE *fichier = fopen("out.wav", "rb");
 
