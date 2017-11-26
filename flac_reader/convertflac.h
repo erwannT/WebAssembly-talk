@@ -14,7 +14,7 @@ static unsigned channels = 0;
 static unsigned bps = 0;
 
 
-void convertFlacToWav();
+void convertFlacToWav(const char* inFileName, const char* outFileName);
 
 
 

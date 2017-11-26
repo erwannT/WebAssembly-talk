@@ -28,19 +28,14 @@ static FLAC__bool write_little_endian_uint32(FILE *f, FLAC__uint32 x)
            fputc(x >> 24, f) != EOF;
 }
 
-void convertFlacToWav()
+void convertFlacToWav(const char* inFileName, const char* outFileName)
 {
     FLAC__bool ok = true;
     FLAC__StreamDecoder *decoder = 0;
     FLAC__StreamDecoderInitStatus init_status;
     FILE *fout;
 
-    // if(argc != 3) {
-    // 	fprintf(stderr, "usage: %s infile.flac outfile.wav\n", argv[0]);
-    // 	return 1;
-    // }
-
-    if ((fout = fopen("out.wav", "wb")) == NULL)
+    if ((fout = fopen(outFileName, "wb")) == NULL)
     {
         printf( "ERROR: opening out.wav for output\n");
         exit(1);
@@ -55,7 +50,7 @@ void convertFlacToWav()
 
     (void)FLAC__stream_decoder_set_md5_checking(decoder, true);
 
-    init_status = FLAC__stream_decoder_init_file(decoder, "infile.flac", write_callback, metadata_callback, error_callback, /*client_data=*/fout);
+    init_status = FLAC__stream_decoder_init_file(decoder, inFileName, write_callback, metadata_callback, error_callback, /*client_data=*/fout);
     if (init_status != FLAC__STREAM_DECODER_INIT_STATUS_OK)
     {
         printf( "ERROR: initializing decoder: %s\n", FLAC__StreamDecoderInitStatusString[init_status]);

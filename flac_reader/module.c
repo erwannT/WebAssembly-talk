@@ -9,24 +9,24 @@
 
 #include "convertflac.h"
 
-// #include "FLAC/stream_decoder.h"
-// static FLAC__uint64 total_samples = 0;
-
-#define TAILLE_MAX 1000
-
 void list_audio_devices(const ALCchar *devices);
 void manage_error();
-char *get_PCM_info();
+char *get_PCM_info(const char *filename, uint32_t *dataSize, uint32_t *freq);
 
 int main(int argc, char **argv)
 {
+  const char *inFilename = "infile.flac";
+  const char *outFilename = "out.wav";
 
   printf("Hello FLAC World\n");
-  convertFlacToWav();
+
+  printf("Starting convert flac to wav");
+  convertFlacToWav(inFilename, outFilename);
+  printf("Conversion done!");
 
   uint32_t dataSize;
   uint32_t freq;
-  char *data = get_PCM_info(&dataSize, &freq);
+  char *data = get_PCM_info(outFilename, &dataSize, &freq);
 
   list_audio_devices(alcGetString(NULL, ALC_DEVICE_SPECIFIER));
 
@@ -36,38 +36,37 @@ int main(int argc, char **argv)
   if (!device)
   {
     printf("No device \n");
+    exit(-1);
   }
   else
   {
-    printf("Device ready \n");
-  }
+    ALCcontext *context;
+    context = alcCreateContext(device, NULL);
+    if (!alcMakeContextCurrent(context))
+    {
+      printf("No context");
+      exit(-1);
+    }
+    else
+    {
+      ALuint buffer;
+      ALuint source;
 
-  ALCcontext *context;
+      alGenBuffers((ALuint)1, &buffer);
+      manage_error();
 
-  context = alcCreateContext(device, NULL);
-  if (!alcMakeContextCurrent(context))
-  {
-    printf("failed");
-  }
-  else
-  {
-    ALuint buffer;
-    ALuint source;
+      alBufferData(buffer, AL_FORMAT_STEREO16, data, dataSize, freq);
+      manage_error();
 
-    alGenBuffers((ALuint)1, &buffer);
-    manage_error();
+      alGenSources((ALuint)1, &source);
+      manage_error();
 
-    alBufferData(buffer, AL_FORMAT_STEREO16, data, dataSize, freq);
-    manage_error();
+      alSourcei(source, AL_BUFFER, buffer);
+      manage_error();
 
-    alGenSources((ALuint)1, &source);
-    manage_error();
-
-    alSourcei(source, AL_BUFFER, buffer);
-    manage_error();
-
-    alSourcePlay(source);
-    manage_error();
+      alSourcePlay(source);
+      manage_error();
+    }
   }
 }
 
@@ -76,16 +75,16 @@ void list_audio_devices(const ALCchar *devices)
   const ALCchar *device = devices, *next = devices + 1;
   size_t len = 0;
 
-  fprintf(stdout, "Devices list:\n");
-  fprintf(stdout, "----------\n");
+  printf("Devices list:\n");
+  printf("----------\n");
   while (device && *device != '\0' && next && *next != '\0')
   {
-    fprintf(stdout, "Mon device est %s\n", device);
+    printf("Mon device est %s\n", device);
     len = strlen(device);
     device += (len + 1);
     next += (len + 2);
   }
-  fprintf(stdout, "----------\n");
+  printf("----------\n");
 }
 
 void manage_error()
@@ -99,14 +98,14 @@ void manage_error()
   }
 }
 
-char *get_PCM_info(uint32_t *dataSize, uint32_t *freq)
+char *get_PCM_info(const char *filename, uint32_t *dataSize, uint32_t *freq)
 {
-  FILE *fichier = fopen("out.wav", "rb");
+  FILE *fichier = fopen(filename, "rb");
 
   if (fichier == NULL)
   {
-    printf("FICHIER IS NULL");
-    return NULL;
+    printf("No file");
+    exit(-1);
   }
   else
   {
@@ -174,8 +173,6 @@ char *get_PCM_info(uint32_t *dataSize, uint32_t *freq)
 
     char *data = malloc(*dataSize);
 
-    data[0] = 'T';
-    data[1] = 0;
     uint32_t ret = fread(data, 1, *dataSize, fichier);
 
     printf("End of read %u \n", ret);
