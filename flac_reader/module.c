@@ -172,10 +172,7 @@ char *get_PCM_info(const char *filename, uint32_t *dataSize, uint32_t *freq)
     printf("DataSize %u \n", *dataSize);
 
     char *data = malloc(*dataSize);
-
-    uint32_t ret = fread(data, 1, *dataSize, fichier);
-
-    printf("End of read %u \n", ret);
+    fread(data, 1, *dataSize, fichier);
 
     return data;
   }
