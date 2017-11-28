@@ -16,7 +16,7 @@ char *get_PCM_info(const char *filename, uint32_t *dataSize, uint32_t *freq);
 
 int main(int argc, char **argv)
 {
-  printf("ready to play \n");
+  printf("Ready to play !!!\n");
 }
 
 ALuint EMSCRIPTEN_KEEPALIVE play()
